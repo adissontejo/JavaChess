@@ -15,14 +15,19 @@ import com.javachess.piece.Piece;
  *
  */
 public class Board {
-
+    //@ spec_public
     private final Map<Square, Piece> positions;
 
+    //@ invariant positions != null;
+
+    //@ ensures positions instanceof HashMap<Square, Piece>;
+    //@ pure
     public Board() {
         positions = new HashMap<Square, Piece>();
     }
 
-    /* Used only for copying */
+    //@ requires newBoard != null;
+    //@ pure
     private Board(Map<Square, Piece> newBoard) {
         this.positions = newBoard;
     }
@@ -35,6 +40,8 @@ public class Board {
         return new ArrayList<Square>(positions.keySet());
     }
 
+    //@ ensures \result == positions.get(square);
+    //@ pure
     public Piece at(Square square) {
         return positions.get(square);
     }
@@ -56,6 +63,12 @@ public class Board {
         setPieceAt(dst, piece);
     }
 
+    //@  requires square != null;
+    //@  ensures \result == !positions.containsKey(square);
+    //@ also
+    //@  requires square == null;
+    //@  ensures \result == false;
+    //@ pure
     public boolean isFree(Square square) {
         if (square == null) {
             return false;
@@ -64,11 +77,17 @@ public class Board {
         return !positions.containsKey(square);
     }
 
+    //@  requires at(square) != null;
+    //@  ensures \result == (at(square).color() == color);
+    //@ also
+    //@  requires at(square) == null;
+    //@  ensures \result == false;
+    //@ pure
     public boolean isColor(Square square, Color color) {
         Piece piece = at(square);
 
         if (piece != null) {
-            return piece.color().equals(color);
+            return piece.color() == color;
         }
 
         return false;

@@ -21,7 +21,9 @@ public enum Piece {
     BLACK_ROOK(PieceType.ROOK, Color.BLACK),
     BLACK_PAWN(PieceType.PAWN, Color.BLACK);
 
+    //@ spec_public
     private final PieceType type;
+    //@ spec_public
     private final Color color;
 
     Piece(PieceType type, Color color) {
@@ -29,6 +31,8 @@ public enum Piece {
         this.color = color;
     }
 
+    //@ ensures \result == color;
+    //@ pure
     public Color color() {
         return color;
     }
