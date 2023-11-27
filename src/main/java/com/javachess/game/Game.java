@@ -62,6 +62,16 @@ public class Game {
         }
     }
 
+
+
+    /*@ requires !moveHistory.isEmpty() && !stateHistory.isEmpty();
+      @ ensures \old(moveHistory.size()) == moveHistory.size() + 1;
+      @ ensures \old(stateHistory.size()) == stateHistory.size() + 1;
+      @ ensures (\forall int i; 0 <= i && i < moveHistory.size(); \old(moveHistory.get(i)) == moveHistory.get(i));
+      @ ensures (\forall int i; 0 <= i && i < stateHistory.size(); \old(stateHistory.get(i)) == stateHistory.get(i));
+      @ ensures \old(state) != state;
+      @ assignable moveHistory, stateHistory, state;
+      @*/
     public void undo() {
         moveHistory.peek().undo();
         moveHistory.pop();
@@ -69,6 +79,12 @@ public class Game {
         state = stateHistory.pop();
     }
 
+    /*@ requires move != null;
+      @ ensures moveHistory.contains(move);
+      @ ensures (\exists int i; 0 <= i && i < \old(moveHistory.size());
+      @          moveHistory.get(i) == move && stateHistory.get(i) == \old(state.copy()));
+      @ assignable moveHistory, stateHistory;
+      @*/
     private void executeMove(Move move) {
         move.execute();
 
