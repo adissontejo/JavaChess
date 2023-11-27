@@ -27,15 +27,26 @@ public class Board {
     }
 
     //@ requires newBoard != null;
+    //@ ensures positions == newBoard;
+    //@ ensures \forall Square s; ; \old(newBoard.get(s)) == newBoard.get(s);
     //@ pure
     private Board(Map<Square, Piece> newBoard) {
         this.positions = newBoard;
     }
 
+    //@ ensures \forall Square s; ; at(s) == \result.at(s);
+    //@ pure
     public Board copy() {
-        return new Board(new HashMap<Square, Piece>(positions));
+        Map<Square, Piece> map = new HashMap<Square, Piece>(positions);
+        
+        //@ assert \forall Square s; ; map.get(s) == positions.get(s);
+
+        Board board = new Board(map);
+
+        return board;
     }
 
+    //@ pure
     public List<Square> allSquares() {
         return new ArrayList<Square>(positions.keySet());
     }

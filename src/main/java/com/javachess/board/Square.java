@@ -1,10 +1,16 @@
 package com.javachess.board;
 
 public class Square {
-
+    //@ spec_public
     private final int col;
+    //@ spec_public
     private final int row;
 
+    //@  requires col >= 0 && col < 8 && row >= 0 && row < 8;
+    //@  ensures \result.row == row && \result.col == col;
+    //@ also
+    //@  requires col < 0 || col >= 8 || row < 0 || row >= 8;
+    //@  ensures \result == null;
     public static Square at(int row, int col) {
         Square newSquare = new Square(row, col);
 
@@ -25,6 +31,9 @@ public class Square {
         return newSquare;
     }
 
+    //@ ensures this.col == column;
+    //@ ensures this.row == row;
+    //@ pure
     private Square(int row, int column) {
         this.col = column;
         this.row = row;
@@ -38,6 +47,8 @@ public class Square {
         return row;
     }
 
+    //@ ensures \result == (col >= 0 && col < 8 && row >= 0 && row < 8);
+    //@ pure
     public boolean isValid() {
         return col >= 0 && col < 8 && row >= 0 && row < 8;
     }
