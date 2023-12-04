@@ -6,11 +6,13 @@ public class Square {
     //@ spec_public
     private final int row;
 
-    //@  requires col >= 0 && col < 8 && row >= 0 && row < 8;
-    //@  ensures \result.row == row && \result.col == col;
-    //@ also
-    //@  requires col < 0 || col >= 8 || row < 0 || row >= 8;
-    //@  ensures \result == null;
+    /*@   requires col >= 0 && col < 8 && row >= 0 && row < 8;
+      @   ensures \result.row == row && \result.col == col;
+      @ also
+      @   requires col < 0 || col >= 8 || row < 0 || row >= 8;
+      @   ensures \result == null;
+      @ pure
+      @*/
     public static Square at(int row, int col) {
         Square newSquare = new Square(row, col);
 
@@ -21,6 +23,13 @@ public class Square {
         return newSquare;
     }
 
+    /*@   requires col >= 0 && col < 8 && row >= 0 && row < 8;
+      @   ensures \result.row == square.row + row && \result.col = square.col + col
+      @ also
+      @   requires col < 0 || col >= 8 || row < 0 || row >= 8;
+      @   ensures \result == null;
+      @ pure
+      @*/
     public static Square atOffset(Square square, int row, int col) {
         Square newSquare = new Square(square.getRow() + row, square.getCol() + col);
 
@@ -31,28 +40,39 @@ public class Square {
         return newSquare;
     }
 
-    //@ ensures this.col == column;
-    //@ ensures this.row == row;
-    //@ pure
+    /*@ ensures this.col == column;
+      @ ensures this.row == row;
+      @ pure
+      @*/
     private Square(int row, int column) {
         this.col = column;
         this.row = row;
     }
 
+    /*@ ensures \result == this.col
+      @ pure
+      @*/
     public int getCol() {
         return col;
     }
 
+    /*@ ensures \result == this.row;
+      @ pure
+      @*/
     public int getRow() {
         return row;
     }
 
-    //@ ensures \result == (col >= 0 && col < 8 && row >= 0 && row < 8);
-    //@ pure
+    /*@ ensures \result == (col >= 0 && col < 8 && row >= 0 && row < 8);
+      @ pure
+      @*/
     public boolean isValid() {
         return col >= 0 && col < 8 && row >= 0 && row < 8;
     }
 
+    /*@ ensures \result = (31 + this.col) * 31 + this.row;
+      @ pure
+      @*/
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -62,6 +82,25 @@ public class Square {
         return result;
     }
 
+    /*@   requires this == obj;
+      @   ensures \result;
+      @ also
+      @   requires this != obj;
+      @   {|
+      @     requires obj == null;
+      @     ensures !\result;
+      @   also
+      @     requires obj != null;
+      @     {|
+      @       requires getClass() != obj.getClass();
+      @       ensures !\result;
+      @     also
+      @       requires getClass() == obj.getClass();
+      @       ensures \result == (col == (Square obj).col && row == (Square obj).row);
+      @     |}
+      @   |}
+      @ pure
+      @*/
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

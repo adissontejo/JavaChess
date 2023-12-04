@@ -10,7 +10,9 @@ import com.javachess.move.StandardMove;
 import com.javachess.piece.Color;
 
 public class MoveGeneratorHelper {
-
+    /*@   requires src != null && dst !== null && (board.isFree(dst) || board.isColor(dst, color.opponent()));
+      @   ensures moves.size() == \old(moves.size()) + 1;
+      @*/
     public static void addMoveIfEmptyOrOpponent(final Square src, final Square dst, final Color color,
             final List<Move> moves, final Board board) {
         if (src == null || dst == null) {

@@ -20,22 +20,25 @@ public class Board {
 
     //@ invariant positions != null;
 
-    //@ ensures positions instanceof HashMap<Square, Piece>;
-    //@ pure
+    /*@ ensures positions instanceof HashMap<Square, Piece>;
+      @ pure
+      @*/
     public Board() {
         positions = new HashMap<Square, Piece>();
     }
 
-    //@ requires newBoard != null;
-    //@ ensures positions == newBoard;
-    //@ ensures \forall Square s; ; \old(newBoard.get(s)) == newBoard.get(s);
-    //@ pure
+    /*@ requires newBoard != null;
+      @ ensures positions == newBoard;
+      @ ensures \forall Square s; ; \old(newBoard.get(s)) == newBoard.get(s);
+      @ pure
+      @*/
     private Board(Map<Square, Piece> newBoard) {
         this.positions = newBoard;
     }
 
-    //@ ensures \forall Square s; ; at(s) == \result.at(s);
-    //@ pure
+    /*@ ensures \forall Square s; ; at(s) == \result.at(s);
+      @ pure
+      @*/
     public Board copy() {
         Map<Square, Piece> map = new HashMap<Square, Piece>(positions);
         
@@ -46,27 +49,41 @@ public class Board {
         return board;
     }
 
-    //@ pure
+    /*@ ensures \result instanceof ArrayList<Square>;
+      @ ensures \forall Square s; ; \result.contains(s) <=> positions.contains(s);
+      @ pure
+      @*/
     public List<Square> allSquares() {
         return new ArrayList<Square>(positions.keySet());
     }
 
-    //@ ensures \result == positions.get(square);
-    //@ pure
+    /*@ ensures \result == positions.get(square);
+      @ pure
+      @*/
     public Piece at(Square square) {
         return positions.get(square);
     }
 
+    /*@ ensures !positions.contains(square);
+      @ assigns positions;
+      @*/
     public void removePieceAt(Square square) {
         positions.remove(square);
     }
 
+    /*@ ensures (position != null && piece != null) ==> (at(position) == piece);
+      @ assigns positions;
+      @*/
     public void setPieceAt(Square position, Piece piece) {
         if (position != null && piece != null) {
             positions.put(position, piece);
         }
     }
 
+    /*@ ensures !positions.contains(src);
+      @ ensures (dst != null && \old(at(src)) != null) ==> (at(dst) == \old(at(src)));
+      @ assigns positions;
+      @*/
     public void movePiece(Square src, Square dst) {
         Piece piece = at(src);
 
@@ -74,12 +91,13 @@ public class Board {
         setPieceAt(dst, piece);
     }
 
-    //@  requires square != null;
-    //@  ensures \result == !positions.containsKey(square);
-    //@ also
-    //@  requires square == null;
-    //@  ensures \result == false;
-    //@ pure
+    /*@   requires square != null;
+      @   ensures \result == !positions.containsKey(square);
+      @ also
+      @   requires square == null;
+      @   ensures \result == false;
+      @ pure
+      @*/
     public boolean isFree(Square square) {
         if (square == null) {
             return false;
@@ -88,12 +106,13 @@ public class Board {
         return !positions.containsKey(square);
     }
 
-    //@  requires at(square) != null;
-    //@  ensures \result == (at(square).color() == color);
-    //@ also
-    //@  requires at(square) == null;
-    //@  ensures \result == false;
-    //@ pure
+    /*@   requires at(square) != null;
+      @   ensures \result == (at(square).color() == color);
+      @ also
+      @   requires at(square) == null;
+      @   ensures \result == false;
+      @ pure
+      @*/
     public boolean isColor(Square square, Color color) {
         Piece piece = at(square);
 

@@ -8,6 +8,6 @@ import com.javachess.move.Move;
 import com.javachess.piece.Color;
 
 public interface MoveGenerator {
-
+    //@ pure
     public List<Move> generateMoves(Square square, Color color, Board board);
 }

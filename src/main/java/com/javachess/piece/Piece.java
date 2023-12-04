@@ -26,25 +26,39 @@ public enum Piece {
     //@ spec_public
     private final Color color;
 
+    /*@ ensures this.type == type;
+      @ ensures this.color == color;
+      @ pure
+      @*/
     Piece(PieceType type, Color color) {
         this.type = type;
         this.color = color;
     }
 
-    //@ ensures \result == color;
-    //@ pure
+    /*@ ensures \result == color;
+      @ pure
+      @*/
     public Color color() {
         return color;
     }
 
+    /*@ ensures \result == type;
+      @ pure
+      @*/
     public PieceType type() {
         return type;
     }
 
+    /*@ ensures \result == color.equals(otherColor);
+      @ pure
+      @*/
     public boolean isColor(Color otherColor) {
         return color.equals(otherColor);
     }
 
+    /*@ ensures \result == type.equals(otherType);
+      @ pure
+      @*/
     public boolean isType(PieceType otherType) {
         return type.equals(otherType);
     }

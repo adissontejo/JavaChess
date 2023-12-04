@@ -19,6 +19,9 @@ public enum PieceType {
 
     MoveGenerator generator;
 
+    /*@ ensures this.generator == generator;
+      @ pure 
+      @*/
     private PieceType(MoveGenerator generator) {
         this.generator = generator;
     }
