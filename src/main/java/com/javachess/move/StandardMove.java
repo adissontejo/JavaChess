@@ -5,18 +5,24 @@ import com.javachess.board.Square;
 import com.javachess.piece.Piece;
 
 public class StandardMove implements Move {
+    //@ spec_public
+    protected Board board; //@ in theBoard;
+    //@ spec_public
+    protected Square srcSquare; //@ in source;
+    //@ spec_public
+    protected Square dstSquare; //@ in dst;
+    //@ spec_public
+    protected Piece capturedPiece; //@ in theCapturedPiece;
 
-    protected Board board;
-    protected Square srcSquare;
-    protected Square dstSquare;
-    protected Piece capturedPiece;
-
-    //@ invariant board != null;
+    //@ public represents theBoard = board;
+    //@ public represents source = srcSquare;
+    //@ public represents dst = dstSquare;
+    //@ public represents theCapturedPiece = capturedPiece;
 
     /*@ requires board != null;
-      @ ensures this.srcSquare == sourceSquare;
-      @ ensures this.board == board;
-      @ ensures this.dstSquare == targetSquare;
+      @ ensures source == sourceSquare;
+      @ ensures dst == targetSquare;
+      @ ensures theBoard == board;
       @ pure
       @*/
     public StandardMove(Square sourceSquare, Square targetSquare, Board board) {
@@ -25,12 +31,6 @@ public class StandardMove implements Move {
         this.dstSquare = targetSquare;
     }
 
-    /*@ ensures board.at(srcSquare) == null;
-      @ ensures (dstSquare != null) 
-      @         ==> (board.at(dstSquare) == \old(board.at(srcSquare)));
-      @ ensures capturedPiece == \old(board.at(dstSquare));
-      @ assignable board, capturedPiece 
-      @*/
     @Override
     public void execute() {
         Piece sourcePiece = board.at(srcSquare);
@@ -43,12 +43,6 @@ public class StandardMove implements Move {
     }
 
     @Override
-    /*@ ensures (dstSquare != null) ==> (board.at(dstSquare) == \old(capturedPiece));
-      @ ensures (srcSquare != null && \old(board.at(dstSquare)) != null)
-      @         ==>  board.at(srcSquare) == \old(board.at(dstSquare));
-      @ ensures capturedPiece == null;
-      @ assignable board, capturedPiece
-      @*/
     public void undo() {
         Piece movedPiece = board.at(dstSquare);
 
@@ -59,33 +53,21 @@ public class StandardMove implements Move {
         capturedPiece = null;
     }
 
-    /*@ ensures \result == srcSquare;
-      @ pure
-      @*/
     @Override
     public Square getSource() {
         return srcSquare;
     }
 
-    /*@ ensures \result == dstSquare;
-      @ pure
-      @*/
     @Override
     public Square getDst() {
         return dstSquare;
     }
 
-    /*@ ensures \result == capturedPiece;
-      @ pure
-      @*/
     @Override
     public Piece getCapturedPiece() {
         return capturedPiece;
     }
 
-    /*@ ensures \result == (srcSquare.equals(source) && dstSquare.equals(target));
-      @ pure
-      @*/
     @Override
     public boolean equals(Square source, Square target) {
         return getSource().equals(source) && getDst().equals(target);

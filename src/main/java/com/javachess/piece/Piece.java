@@ -26,7 +26,11 @@ public enum Piece {
     //@ spec_public
     private final Color color;
 
-    /*@ ensures this.type == type;
+    //@ public invariant type != null;
+    //@ public invariant color != null;
+
+    /*@ requires type != null && color != null;
+      @ ensures this.type == type;
       @ ensures this.color == color;
       @ pure
       @*/
@@ -49,20 +53,25 @@ public enum Piece {
         return type;
     }
 
-    /*@ ensures \result == color.equals(otherColor);
+    /*@ ensures \result == (color == otherColor);
       @ pure
       @*/
     public boolean isColor(Color otherColor) {
-        return color.equals(otherColor);
+        return color == otherColor;
     }
 
-    /*@ ensures \result == type.equals(otherType);
+    /*@ ensures \result == (type == otherType);
       @ pure
       @*/
     public boolean isType(PieceType otherType) {
-        return type.equals(otherType);
+        return type == otherType;
     }
 
+    /*@ requires position != null && board != null;
+      @ ensures \forall Move m; ; \result.contains(m) <==>
+      @         type.generator.generateMoves(position, color, board).contains(m);
+      @ pure
+      @*/
     public List<Move> availableMoves(Square position, Board board) {
         return type.generator.generateMoves(position, color, board);
     }

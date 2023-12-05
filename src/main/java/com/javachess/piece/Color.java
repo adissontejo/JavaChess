@@ -38,6 +38,7 @@ public enum Color {
       @ also
       @   requires this == Color.WHITE;
       @   ensures \result == Color.BLACK;
+      @ pure
       @*/
     public Color opponent() {
         if (this == Color.BLACK) {

@@ -18,7 +18,7 @@ public class Board {
     //@ spec_public
     private final Map<Square, Piece> positions;
 
-    //@ invariant positions != null;
+    //@ public invariant positions != null;
 
     /*@ ensures positions instanceof HashMap<Square, Piece>;
       @ pure
@@ -37,11 +37,12 @@ public class Board {
     }
 
     /*@ ensures \forall Square s; ; at(s) == \result.at(s);
+      @ ensures \forall Square s; ; positions.get(s) == \old(positions.get(s));
       @ pure
       @*/
     public Board copy() {
         Map<Square, Piece> map = new HashMap<Square, Piece>(positions);
-        
+
         //@ assert \forall Square s; ; map.get(s) == positions.get(s);
 
         Board board = new Board(map);
@@ -50,11 +51,16 @@ public class Board {
     }
 
     /*@ ensures \result instanceof ArrayList<Square>;
-      @ ensures \forall Square s; ; \result.contains(s) <=> positions.contains(s);
+      @ ensures \forall Square s; ; \result.contains(s) <==> positions.containsKey(s);
       @ pure
       @*/
     public List<Square> allSquares() {
-        return new ArrayList<Square>(positions.keySet());
+        List<Square> squares = new ArrayList<>(positions.keySet());
+
+        //@ assert \forall Square s; ; squares.contains(s) <==> positions.keySet().contains(s);
+        //@ assert \forall Square s; ; positions.keySet().contains(s) <==> positions.containsKey(s);
+
+        return squares;
     }
 
     /*@ ensures \result == positions.get(square);
@@ -64,25 +70,35 @@ public class Board {
         return positions.get(square);
     }
 
-    /*@ ensures !positions.contains(square);
-      @ assigns positions;
+    /*@ requires square != null;
+      @ ensures !positions.containsKey(square);
+      @ ensures \forall Square s; s != square ; at(s) == \old(at(s));
+      @ ensures \forall Square s; s != square ;
+      @         positions.containsKey(s) == \old(positions.containsKey(s));
+      @ assignable positions.objectState;
       @*/
     public void removePieceAt(Square square) {
         positions.remove(square);
     }
 
-    /*@ ensures (position != null && piece != null) ==> (at(position) == piece);
-      @ assigns positions;
+    /*@ requires position != null && piece != null;
+      @ ensures at(position) == piece;
+      @ ensures \forall Square s; s != position ; at(s) == \old(at(s));
+      @ ensures \forall Square s; s != position ;
+      @          positions.containsKey(s) == \old(positions.containsKey(s));
+      @ assignable positions.objectState;
       @*/
     public void setPieceAt(Square position, Piece piece) {
-        if (position != null && piece != null) {
-            positions.put(position, piece);
-        }
+        positions.put(position, piece);
     }
 
-    /*@ ensures !positions.contains(src);
-      @ ensures (dst != null && \old(at(src)) != null) ==> (at(dst) == \old(at(src)));
-      @ assigns positions;
+    /*@ requires src != null && dst != null && at(src) != null;
+      @ ensures src != dst ==> !positions.containsKey(src);
+      @ ensures at(dst) == \old(at(src));
+      @ ensures \forall Square s; s != src && s != dst ; at(s) == \old(at(s));
+      @ ensures \forall Square s; s != src && s != dst ;
+      @          positions.containsKey(s) == \old(positions.containsKey(s));
+      @ assigns positions.objectState;
       @*/
     public void movePiece(Square src, Square dst) {
         Piece piece = at(src);

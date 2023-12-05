@@ -10,8 +10,21 @@ import com.javachess.move.StandardMove;
 import com.javachess.piece.Color;
 
 public class MoveGeneratorHelper {
-    /*@   requires src != null && dst !== null && (board.isFree(dst) || board.isColor(dst, color.opponent()));
-      @   ensures moves.size() == \old(moves.size()) + 1;
+    /*@ requires color != null && moves != null && board != null;
+      @ {|
+      @     requires src != null && dst != null;
+      @     requires (board.isFree(dst) || board.isColor(dst, color.opponent()));
+      @     ensures moves.size() == \old(moves.size()) + 1;
+      @     ensures moves.get(moves.size() - 1).source == src;
+      @     ensures moves.get(moves.size() - 1).dst == dst;
+      @     assignable moves.values;
+      @   also
+      @     requires src == null || dst == null;
+      @     assignable \nothing;
+      @   also
+      @     requires !board.isFree(dst) && !board.isColor(dst, color.opponent());
+      @     assignable \nothing;
+      @ |}
       @*/
     public static void addMoveIfEmptyOrOpponent(final Square src, final Square dst, final Color color,
             final List<Move> moves, final Board board) {
@@ -20,7 +33,12 @@ public class MoveGeneratorHelper {
         }
 
         if (board.isFree(dst) || board.isColor(dst, color.opponent())) {
-            moves.add(new StandardMove(src, dst, board));
+            Move move = new StandardMove(src, dst, board);
+
+            //@ assert move.source == src;
+            //@ assert move.dst == dst;
+
+            moves.add(move);
         }
     }
 

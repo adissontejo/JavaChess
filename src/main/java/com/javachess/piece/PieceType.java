@@ -17,10 +17,14 @@ public enum PieceType {
     ROOK(new RookMoveGenerator()),
     PAWN(new PawnMoveGenerator());
 
+    //@ spec_public
     MoveGenerator generator;
 
-    /*@ ensures this.generator == generator;
-      @ pure 
+    //@ public invariant generator != null;
+
+    /*@ requires generator != null;
+      @ ensures this.generator == generator;
+      @ pure
       @*/
     private PieceType(MoveGenerator generator) {
         this.generator = generator;

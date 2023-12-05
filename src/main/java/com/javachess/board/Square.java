@@ -2,9 +2,9 @@ package com.javachess.board;
 
 public class Square {
     //@ spec_public
-    private final int col;
+    private final int col; //@ in theHashCode;
     //@ spec_public
-    private final int row;
+    private final int row; //@ in theHashCode;
 
     /*@   requires col >= 0 && col < 8 && row >= 0 && row < 8;
       @   ensures \result.row == row && \result.col == col;
@@ -23,11 +23,21 @@ public class Square {
         return newSquare;
     }
 
-    /*@   requires col >= 0 && col < 8 && row >= 0 && row < 8;
-      @   ensures \result.row == square.row + row && \result.col = square.col + col
-      @ also
-      @   requires col < 0 || col >= 8 || row < 0 || row >= 8;
-      @   ensures \result == null;
+    /*@ requires square != null;
+      @ {|
+      @     requires square.row + row >= 0 &&
+      @              square.row + row < 8 &&
+      @              square.col + col >= 0 &&
+      @              square.col + col < 8;
+      @     ensures \result.row == square.row + row && \result.col == square.col + col;
+      @   also
+      @     requires square.row + row < 0 ||
+      @              square.row + row >= 8 ||
+      @              square.col + col < 0 ||
+      @              square.col + col >= 8;
+      @     ensures \result == null;
+      @ |}
+      @ code_bigint_math
       @ pure
       @*/
     public static Square atOffset(Square square, int row, int col) {
@@ -49,7 +59,7 @@ public class Square {
         this.row = row;
     }
 
-    /*@ ensures \result == this.col
+    /*@ ensures \result == this.col;
       @ pure
       @*/
     public int getCol() {
@@ -70,19 +80,21 @@ public class Square {
         return col >= 0 && col < 8 && row >= 0 && row < 8;
     }
 
-    /*@ ensures \result = (31 + this.col) * 31 + this.row;
-      @ pure
+    //@ public represents theHashCode = 31 * (31 + col) + row;
+
+    /*@ also
+      @   ensures \result == 31 * (31 + col) + row;
+      @   code_bigint_math
       @*/
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = prime * result + col;
-        result = prime * result + row;
-        return result;
+
+        return prime * (prime + col) + row;
     }
 
-    /*@   requires this == obj;
+    /*@ also
+      @   requires this == obj;
       @   ensures \result;
       @ also
       @   requires this != obj;
@@ -96,7 +108,7 @@ public class Square {
       @       ensures !\result;
       @     also
       @       requires getClass() == obj.getClass();
-      @       ensures \result == (col == (Square obj).col && row == (Square obj).row);
+      @       ensures \result == (col == ((Square) obj).col && row == ((Square) obj).row);
       @     |}
       @   |}
       @ pure
