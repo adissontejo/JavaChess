@@ -70,38 +70,59 @@ public class Board {
         return positions.get(square);
     }
 
-    /*@ requires square != null;
-      @ ensures !positions.containsKey(square);
-      @ ensures \forall Square s; s != square ; at(s) == \old(at(s));
-      @ ensures \forall Square s; s != square ;
-      @         positions.containsKey(s) == \old(positions.containsKey(s));
-      @ assignable positions.objectState;
+    /*@   requires square != null;
+      @   ensures !positions.containsKey(square);
+      @   ensures \forall Square s; s != square ; at(s) == \old(at(s));
+      @   ensures \forall Square s; s != square ;
+      @           positions.containsKey(s) == \old(positions.containsKey(s));
+      @   assignable positions;
+      @ also
+      @   requires square == null;
+      @   assignable \nothing;
       @*/
     public void removePieceAt(Square square) {
+        if (square == null) {
+            return;
+        }
+
         positions.remove(square);
     }
 
-    /*@ requires position != null && piece != null;
-      @ ensures at(position) == piece;
-      @ ensures \forall Square s; s != position ; at(s) == \old(at(s));
-      @ ensures \forall Square s; s != position ;
+    /*@   requires position != null && piece != null;
+      @   ensures at(position) == piece;
+      @   ensures \forall Square s; s != position ; at(s) == \old(at(s));
+      @   ensures \forall Square s; s != position ;
       @          positions.containsKey(s) == \old(positions.containsKey(s));
-      @ assignable positions.objectState;
+      @   assignable positions;
+      @ also
+      @   requires position == null || piece == null;
+      @   assignable \nothing;
       @*/
     public void setPieceAt(Square position, Piece piece) {
+        if (position == null || piece == null) {
+            return;
+        }
+
         positions.put(position, piece);
     }
 
-    /*@ requires src != null && dst != null && at(src) != null;
-      @ ensures src != dst ==> !positions.containsKey(src);
-      @ ensures at(dst) == \old(at(src));
-      @ ensures \forall Square s; s != src && s != dst ; at(s) == \old(at(s));
-      @ ensures \forall Square s; s != src && s != dst ;
-      @          positions.containsKey(s) == \old(positions.containsKey(s));
-      @ assigns positions.objectState;
+    /*@   requires src != null && dst != null && at(src) != null;
+      @   ensures src != dst ==> !positions.containsKey(src);
+      @   ensures at(dst) == \old(at(src));
+      @   ensures \forall Square s; s != src && s != dst ; at(s) == \old(at(s));
+      @   ensures \forall Square s; s != src && s != dst ;
+      @            positions.containsKey(s) == \old(positions.containsKey(s));
+      @   assignable positions;
+      @ also
+      @   requires src == null || dst == null || at(src) == null;
+      @   assignable \nothing;
       @*/
     public void movePiece(Square src, Square dst) {
         Piece piece = at(src);
+
+        if (src == null || dst == null || piece == null) {
+            return;
+        }
 
         removePieceAt(src);
         setPieceAt(dst, piece);
