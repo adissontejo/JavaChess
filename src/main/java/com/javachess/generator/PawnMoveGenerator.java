@@ -12,36 +12,36 @@ import com.javachess.piece.Color;
 
 public class PawnMoveGenerator implements MoveGenerator {
     /*@ also
-      @  requires square != null && color != null && board != null && move != null;
-      @  ensures \result <==> isMoveValid(square, color, board, move) && (
+      @  requires color != null && board != null && move != null;
+      @  ensures \result <==>
       @          (
-      @            move.getDst().getCol() == square.getCol() &&
-      @            move.getDst().getRow() == square.getRow() + color.dir() &&
-      @            board.isFree(move.getDst())
+      @            move.dst.getCol() == move.source.getCol() &&
+      @            move.dst.getRow() == move.source.getRow() + color.dir() &&
+      @            board.isFree(move.dst)
       @          ) ||
       @          (
-      @            move.getDst().getCol() == square.getCol() &&
-      @            move.getDst().getRow() == square.getRow() + 2 * color.dir() &&
-      @            board.isFree(move.getDst()) &&
-      @            board.isFree(Square.atOffset(square, color.dir(), 0))
+      @            move.dst.getCol() == move.source.getCol() &&
+      @            move.dst.getRow() == move.source.getRow() + 2 * color.dir() &&
+      @            board.isFree(move.dst) &&
+      @            board.isFree(Square.atOffset(move.source, color.dir(), 0)) &&
+      @            move.source.getRow() == color.pawnRow()
       @          ) ||
       @          (
-      @            move.getDst().getCol() == square.getCol() + 1 &&
-      @            move.getDst().getRow() == square.getRow() + color.dir() &&
-      @            board.isColor(move.getDst(), color.opponent())
+      @            move.dst.getCol() == move.source.getCol() + 1 &&
+      @            move.dst.getRow() == move.source.getRow() + color.dir() &&
+      @            board.isColor(move.dst, color.opponent())
       @          ) ||
       @          (
-      @            move.getDst().getCol() == square.getCol() - 1 &&
-      @            move.getDst().getRow() == square.getRow() + color.dir() &&
-      @            board.isColor(move.getDst(), color.opponent())
-      @          ));
+      @            move.dst.getCol() == move.source.getCol() - 1 &&
+      @            move.dst.getRow() == move.source.getRow() + color.dir() &&
+      @            board.isColor(move.dst, color.opponent())
+      @          );
       @ pure
-      @ public model boolean isMoveSemiLegal(Square square, Color color, Board board, Move move);
+      @ public model boolean isMoveCorrect(Color color, Board board, Move move);
       @*/
 
-    /*@ also
-      @   requires square != null && color != null && board != null;
-      @   ensures \forall Move m; ; \result.contains(m) <==> isMoveSemiLegal(square, color, board, m);
+    /*@ code_bigint_math
+      @ pure
       @*/
     @Override
     public List<Move> generateMoves(Square square, Color color, Board board) {
@@ -53,7 +53,9 @@ public class PawnMoveGenerator implements MoveGenerator {
         Square rightDiag = Square.atOffset(square, color.dir(), 1);
 
         if (board.isFree(fwd)) {
-            moves.add(new StandardMove(square, fwd, board));
+            Move move = new StandardMove(square, fwd, board);
+
+            moves.add(move);
         }
 
         if (square.getRow() == color.pawnRow() && board.isFree(fwd) && board.isFree(push)) {
@@ -67,6 +69,12 @@ public class PawnMoveGenerator implements MoveGenerator {
         if (board.isColor(leftDiag, color.opponent())) {
             moves.add(new StandardMove(square, leftDiag, board));
         }
+
+        //@ assert \forall Move m; ; moves.contains(m) ==> square == m.source;
+        //@ assert \forall Move m; ; moves.contains(m) ==> m.dst != null;
+        //@ assert \forall Move m; ; moves.contains(m) ==> m.dst.isValid();
+        //@ assert \forall Move m; ; moves.contains(m) ==> MoveGeneratorHelper.isEmptyOrOpponent(m.dst, color, board);
+        //@ assert \forall Move m; ; moves.contains(m) ==> isMoveCorrect(color, board, m);
 
         return moves;
     }
