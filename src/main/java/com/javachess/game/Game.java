@@ -21,15 +21,22 @@ public class Game {
 
     //@ spec_public
     private GameState state;
+    //@ spec_public
     private final Board board;
+    //@ spec_public
     private final NotationConverter converter;
 
     //@ spec_public
     private final Stack<Move> moveHistory;
     //@ spec_public
     private final Stack<GameState> stateHistory;
+    //@ spec_public
     private final Map<Color, Player> players;
 
+    //@ requires player1 != null && player2 != null && converter != null && initializer != null;
+    //@ ensures board != null && this.converter == converter && this.state != null && moveHistory != null &&
+    //@     stateHistory != null && players != null && players.get(Color.WHITE) == player1 &&
+    //@     players.get(Color.BLACK) == player2;
     public Game(Player player1, Player player2, NotationConverter converter, BoardInitializer initializer) {
         this.board = new Board();
         this.converter = converter;
