@@ -19,11 +19,14 @@ import com.javachess.state.GameState;
 
 public class Game {
 
+    //@ spec_public
     private GameState state;
     private final Board board;
     private final NotationConverter converter;
 
+    //@ spec_public
     private final Stack<Move> moveHistory;
+    //@ spec_public
     private final Stack<GameState> stateHistory;
     private final Map<Color, Player> players;
 
@@ -70,7 +73,6 @@ public class Game {
       @ ensures (\forall int i; 0 <= i && i < moveHistory.size(); \old(moveHistory.get(i)) == moveHistory.get(i));
       @ ensures (\forall int i; 0 <= i && i < stateHistory.size(); \old(stateHistory.get(i)) == stateHistory.get(i));
       @ ensures \old(state) != state;
-      @ assignable moveHistory, stateHistory, state;
       @*/
     public void undo() {
         moveHistory.peek().undo();
@@ -81,9 +83,11 @@ public class Game {
 
     /*@ requires move != null;
       @ ensures moveHistory.contains(move);
-      @ ensures (\exists int i; 0 <= i && i < \old(moveHistory.size());
-      @          moveHistory.get(i) == move && stateHistory.get(i) == \old(state.copy()));
-      @ assignable moveHistory, stateHistory;
+      @ ensures (\forall int i; 0 <= i < moveHistory.size() - 1; \old(moveHistory.get(i)) == moveHistory.get(i));
+      @ ensures moveHistory.get(moveHistory.size() - 1) == move;
+      @ ensures (\forall int i; 0 <= i < stateHistory.size() - 1; \old(stateHistory.get(i)) == stateHistory.get(i));
+      @ ensures moveHistory.get(moveHistory.size() - 1) == move;
+      @ ensures stateHistory.get(stateHistory.size() - 1) == \old(state);
       @*/
     private void executeMove(Move move) {
         move.execute();
