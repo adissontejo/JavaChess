@@ -63,9 +63,11 @@ public class Board {
         return squares;
     }
 
-    /*@   requires square != null;
+    /*@   public normal_behavior
+      @   requires square != null;
       @   ensures \result == positions.get(square);
       @ also
+      @   public normal_behavior
       @   requires square == null;
       @   ensures \result == null;
       @ pure

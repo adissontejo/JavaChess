@@ -9,7 +9,7 @@ public enum Color {
     //@ spec_public
     private final int pawnRow;
 
-    //@ invariant value == -1 || value == 1;
+    //@ axiom \forall Color color; ; (color.value == -1 || color.value == 1) && (color.pawnRow == 1 || color.pawnRow == 6);
 
     /*@ requires value == -1 || value == 1;
       @ ensures this.value == value;

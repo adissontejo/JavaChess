@@ -18,9 +18,9 @@ public enum PieceType {
     PAWN(new PawnMoveGenerator());
 
     //@ spec_public
-    MoveGenerator generator;
+    private final MoveGenerator generator;
 
-    //@ public invariant generator != null;
+    //@ axiom \forall PieceType type; ; type.generator != null;
 
     /*@ requires generator != null;
       @ ensures this.generator == generator;
@@ -28,5 +28,12 @@ public enum PieceType {
       @*/
     private PieceType(MoveGenerator generator) {
         this.generator = generator;
+    }
+
+    /*@ ensures \result == generator;
+      @ pure
+      @*/
+    public MoveGenerator generator() {
+        return generator;
     }
 }

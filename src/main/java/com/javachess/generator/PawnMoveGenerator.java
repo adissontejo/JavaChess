@@ -59,7 +59,7 @@ public class PawnMoveGenerator implements MoveGenerator {
         }
 
         if (square.getRow() == color.pawnRow() && board.isFree(fwd) && board.isFree(push)) {
-            moves.add(new PawnPush(square, board));
+            moves.add(new PawnPush(square, color, board));
         }
 
         if (board.isColor(rightDiag, color.opponent())) {
