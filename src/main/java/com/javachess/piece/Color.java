@@ -9,7 +9,10 @@ public enum Color {
     //@ spec_public
     private final int pawnRow;
 
-    /*@ ensures this.value == value;
+    //@ invariant value == -1 || value == 1;
+
+    /*@ requires value == -1 || value == 1;
+      @ ensures this.value == value;
       @ ensures this.pawnRow == pawnRow;
       @ pure
       @*/
@@ -19,6 +22,7 @@ public enum Color {
     }
 
     /*@ ensures \result == value;
+      @ ensures \result == -1 || \result == 1;
       @ pure
       @*/
     public int dir() {

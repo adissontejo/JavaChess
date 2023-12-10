@@ -63,10 +63,18 @@ public class Board {
         return squares;
     }
 
-    /*@ ensures \result == positions.get(square);
+    /*@   requires square != null;
+      @   ensures \result == positions.get(square);
+      @ also
+      @   requires square == null;
+      @   ensures \result == null;
       @ pure
       @*/
     public Piece at(Square square) {
+        if (square == null) {
+            return null;
+        }
+
         return positions.get(square);
     }
 
@@ -75,7 +83,7 @@ public class Board {
       @   ensures \forall Square s; s != square ; at(s) == \old(at(s));
       @   ensures \forall Square s; s != square ;
       @           positions.containsKey(s) == \old(positions.containsKey(s));
-      @   assignable positions;
+      @   assignable positions.objectState;
       @ also
       @   requires square == null;
       @   assignable \nothing;
@@ -93,7 +101,7 @@ public class Board {
       @   ensures \forall Square s; s != position ; at(s) == \old(at(s));
       @   ensures \forall Square s; s != position ;
       @          positions.containsKey(s) == \old(positions.containsKey(s));
-      @   assignable positions;
+      @   assignable positions.objectState;
       @ also
       @   requires position == null || piece == null;
       @   assignable \nothing;
@@ -112,7 +120,7 @@ public class Board {
       @   ensures \forall Square s; s != src && s != dst ; at(s) == \old(at(s));
       @   ensures \forall Square s; s != src && s != dst ;
       @            positions.containsKey(s) == \old(positions.containsKey(s));
-      @   assignable positions;
+      @   assignable positions.objectState;
       @ also
       @   requires src == null || dst == null || at(src) == null;
       @   assignable \nothing;

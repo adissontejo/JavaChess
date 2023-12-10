@@ -3,10 +3,13 @@ package com.javachess.board;
 public class Square {
     //@ spec_public
     private final int col; //@ in theHashCode;
+                           //@ in uniqueHash;
     //@ spec_public
     private final int row; //@ in theHashCode;
+                           //@ in uniqueHash;
 
     /*@   requires col >= 0 && col < 8 && row >= 0 && row < 8;
+      @   ensures \result != null;
       @   ensures \result.row == row && \result.col == col;
       @ also
       @   requires col < 0 || col >= 8 || row < 0 || row >= 8;
@@ -16,36 +19,33 @@ public class Square {
     public static Square at(int row, int col) {
         Square newSquare = new Square(row, col);
 
+        //@ assert newSquare.row == row && newSquare.col == col;
+        //@ assert col >= 0 && col < 8 && row >= 0 && row < 8 <==> newSquare.isValid();
+
         if (!newSquare.isValid()) {
             return null;
         }
+
+        //@ assert col >= 0 && col < 8 && row >= 0 && row < 8;
+        //@ assert newSquare.row == row && newSquare.col == col;
 
         return newSquare;
     }
 
     /*@ requires square != null;
       @ {|
-      @     requires square.row + row >= 0 &&
-      @              square.row + row < 8 &&
-      @              square.col + col >= 0 &&
-      @              square.col + col < 8;
-      @     ensures \result.row == square.row + row && \result.col == square.col + col;
-      @   also
-      @     requires square.row + row < 0 ||
-      @              square.row + row >= 8 ||
-      @              square.col + col < 0 ||
-      @              square.col + col >= 8;
-      @     ensures \result == null;
+      @   requires at(square.row + row, square.col + col) != null;
+      @   ensures \result != null;
+      @   ensures \result.row == square.row + row && \result.col == square.col + col;
+      @ also
+      @   requires at(square.row + row, square.col + col) == null;
+      @   ensures \result == null;
       @ |}
       @ code_bigint_math
       @ pure
       @*/
     public static Square atOffset(Square square, int row, int col) {
-        Square newSquare = new Square(square.getRow() + row, square.getCol() + col);
-
-        if (!newSquare.isValid()) {
-            return null;
-        }
+        Square newSquare = at(square.getRow() + row, square.getCol() + col);
 
         return newSquare;
     }
@@ -73,7 +73,7 @@ public class Square {
         return row;
     }
 
-    /*@ ensures \result == (col >= 0 && col < 8 && row >= 0 && row < 8);
+    /*@ ensures \result <==> (col >= 0 && col < 8 && row >= 0 && row < 8);
       @ pure
       @*/
     public boolean isValid() {
@@ -81,10 +81,10 @@ public class Square {
     }
 
     //@ public represents theHashCode = 31 * (31 + col) + row;
+    //@ public represents uniqueHash = 31 * (31 + col) + row;
 
-    /*@ also
-      @   ensures \result == 31 * (31 + col) + row;
-      @   code_bigint_math
+    /*@ code_bigint_math
+      @ pure
       @*/
     @Override
     public int hashCode() {
@@ -94,23 +94,13 @@ public class Square {
     }
 
     /*@ also
-      @   requires this == obj;
-      @   ensures \result;
+      @  requires obj != null;
+      @  requires getClass() == obj.getClass();
+      @  ensures \result <==> theHashCode == ((Square) obj).theHashCode;
       @ also
-      @   requires this != obj;
-      @   {|
-      @     requires obj == null;
-      @     ensures !\result;
-      @   also
-      @     requires obj != null;
-      @     {|
-      @       requires getClass() != obj.getClass();
-      @       ensures !\result;
-      @     also
-      @       requires getClass() == obj.getClass();
-      @       ensures \result == (col == ((Square) obj).col && row == ((Square) obj).row);
-      @     |}
-      @   |}
+      @  requires obj != null;
+      @  requires getClass() != obj.getClass();
+      @  ensures \result == false;
       @ pure
       @*/
     @Override
@@ -125,12 +115,7 @@ public class Square {
             return false;
         }
         Square other = (Square) obj;
-        if (col != other.col) {
-            return false;
-        }
-        if (row != other.row) {
-            return false;
-        }
-        return true;
+
+        return other.hashCode() == hashCode();
     }
 }

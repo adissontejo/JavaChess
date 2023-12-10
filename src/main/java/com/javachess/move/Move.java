@@ -9,21 +9,27 @@ public interface Move {
     //@ public instance model Piece theCapturedPiece;
     //@ public instance model com.javachess.board.Board theBoard;
 
+    //@ public invariant source != null;
+    //@ public invariant dst != null;
+    //@ public invariant !source.equals(dst);
+    //@ public invariant source.isValid();
+    //@ public invariant dst.isValid();
     //@ public invariant theBoard != null;
 
-    /*@ ensures theBoard.at(source) == null;
-      @ ensures (dst != null)
-      @         ==> (theBoard.at(dst) == \old(theBoard.at(source)));
+    /*@ requires theBoard.at(source) != null;
+      @ ensures theBoard.at(source) == null;
+      @ ensures theBoard.at(dst) == \old(theBoard.at(source));
       @ ensures theCapturedPiece == \old(theBoard.at(dst));
-      @ assigns theBoard, theCapturedPiece;
+      @ assigns theBoard.positions.objectState, theCapturedPiece;
       @*/
     public void execute();
 
-    /*@ ensures (dst != null) ==> (theBoard.at(dst) == \old(theCapturedPiece));
-      @ ensures (source != null && \old(theBoard.at(dst)) != null)
-      @         ==>  theBoard.at(source) == \old(theBoard.at(dst));
+    /*@ requires theBoard.at(source) == null;
+      @ requires theBoard.at(dst) != null;
+      @ ensures theBoard.at(dst) == \old(theCapturedPiece);
+      @ ensures theBoard.at(source) == \old(theBoard.at(dst));
       @ ensures theCapturedPiece == null;
-      @ assigns theBoard, theCapturedPiece;
+      @ assigns theBoard.positions.objectState, theCapturedPiece;
       @*/
     public void undo();
 
@@ -42,7 +48,8 @@ public interface Move {
       @*/
     public Square getDst();
 
-    /*@ ensures \result == (this.source.equals(src) && this.dst.equals(dst));
+    /*@ requires this.source != null && this.dst != null;
+      @ ensures \result == (this.source.equals(src) && this.dst.equals(dst));
       @ pure
       @*/
     public boolean equals(Square src, Square dst);

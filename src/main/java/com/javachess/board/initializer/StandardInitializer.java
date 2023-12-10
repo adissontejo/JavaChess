@@ -6,9 +6,31 @@ import com.javachess.piece.Color;
 import com.javachess.piece.Piece;
 
 public class StandardInitializer implements BoardInitializer {
-
+    //@ spec_public
     private static final int COLS = 8;
 
+    /*@ also
+      @   requires board != null;
+      @   ensures board.at(Square.at(0, 0)) == Piece.WHITE_ROOK;
+      @   ensures board.at(Square.at(0, 1)) == Piece.WHITE_KNIGHT;
+      @   ensures board.at(Square.at(0, 2)) == Piece.WHITE_BISHOP;
+      @   ensures board.at(Square.at(0, 3)) == Piece.WHITE_QUEEN;
+      @   ensures board.at(Square.at(0, 4)) == Piece.WHITE_KING;
+      @   ensures board.at(Square.at(0, 5)) == Piece.WHITE_BISHOP;
+      @   ensures board.at(Square.at(0, 6)) == Piece.WHITE_KNIGHT;
+      @   ensures board.at(Square.at(0, 7)) == Piece.WHITE_ROOK;
+      @   ensures board.at(Square.at(7, 0)) == Piece.BLACK_ROOK;
+      @   ensures board.at(Square.at(7, 1)) == Piece.BLACK_KNIGHT;
+      @   ensures board.at(Square.at(7, 2)) == Piece.BLACK_BISHOP;
+      @   ensures board.at(Square.at(7, 3)) == Piece.BLACK_QUEEN;
+      @   ensures board.at(Square.at(7, 4)) == Piece.BLACK_KING;
+      @   ensures board.at(Square.at(7, 5)) == Piece.BLACK_BISHOP;
+      @   ensures board.at(Square.at(7, 6)) == Piece.BLACK_KNIGHT;
+      @   ensures board.at(Square.at(7, 7)) == Piece.BLACK_ROOK;
+      @   ensures (\forall int col; 0 <= col < COLS; board.at(Square.at(Color.WHITE.pawnRow(), col)) == Piece.WHITE_PAWN);
+      @   ensures (\forall int col; 0 <= col < COLS; board.at(Square.at(Color.BLACK.pawnRow(), col)) == Piece.BLACK_PAWN);
+      @ pure
+      @*/
     @Override
     public void init(Board board) {
         board.setPieceAt(Square.at(0, 0), Piece.WHITE_ROOK);

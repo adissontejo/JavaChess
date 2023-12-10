@@ -19,7 +19,9 @@ public class StandardMove implements Move {
     //@ public represents dst = dstSquare;
     //@ public represents theCapturedPiece = capturedPiece;
 
-    /*@ requires board != null;
+    /*@ requires board != null && sourceSquare != null && targetSquare != null;
+      @ requires sourceSquare.isValid() && targetSquare.isValid();
+      @ requires !sourceSquare.equals(targetSquare);
       @ ensures source == sourceSquare;
       @ ensures dst == targetSquare;
       @ ensures theBoard == board;
@@ -47,7 +49,9 @@ public class StandardMove implements Move {
         Piece movedPiece = board.at(dstSquare);
 
         board.removePieceAt(dstSquare);
+        //@ assert board.at(dstSquare) == null;
         board.setPieceAt(dstSquare, capturedPiece);
+        //@ assert board.at(dstSquare) == capturedPiece;
         board.setPieceAt(srcSquare, movedPiece);
 
         capturedPiece = null;

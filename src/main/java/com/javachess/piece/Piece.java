@@ -27,6 +27,7 @@ public enum Piece {
     private final Color color;
 
     //@ public invariant type != null;
+    //@ public invariant type.generator != null;
     //@ public invariant color != null;
 
     /*@ requires type != null && color != null;
@@ -68,8 +69,13 @@ public enum Piece {
     }
 
     /*@ requires position != null && board != null;
-      @ ensures \forall Move m; ; \result.contains(m) <==>
-      @         type.generator.generateMoves(position, color, board).contains(m);
+      @ requires position.isValid();
+      @ ensures \result != null;
+      @ ensures \forall int i; 0 <= i < \result.size(); (
+      @   \result.get(i) != null &&
+      @   \result.get(i).source == position &&
+      @   \result.get(i).theBoard == board
+      @ );
       @ pure
       @*/
     public List<Move> availableMoves(Square position, Board board) {
