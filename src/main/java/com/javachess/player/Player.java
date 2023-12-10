@@ -19,6 +19,10 @@ public class Player {
      * @param game
      * @return the next move encoded in a given chess notation
      */
+    /*@ public normal_behavior
+      @ requires game != null;
+      @ ensures \result != null;
+      @*/
     public String takeMove(Game game) {
         String move = scanner.nextLine();
 
