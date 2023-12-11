@@ -6,6 +6,7 @@ import com.javachess.piece.Piece;
 public interface Move {
     //@ public instance model Square source;
     //@ public instance model Square dst;
+    //@ public instance model Piece theSourcePiece;
     //@ public instance model Piece theCapturedPiece;
     //@ public instance model com.javachess.board.Board theBoard;
 
@@ -32,6 +33,11 @@ public interface Move {
       @ assigns theBoard.positions.objectState, theCapturedPiece;
       @*/
     public void undo();
+
+    /*@ ensures \result == theSourcePiece;
+      @ pure
+      @*/
+    public Piece getSourcePiece();
 
     /*@ ensures \result == theCapturedPiece;
       @ pure

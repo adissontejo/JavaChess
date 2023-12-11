@@ -14,12 +14,18 @@ public interface MoveGenerator {
 
     /*@ requires square != null && color != null && board != null;
       @ requires square.isValid();
-      @ ensures \forall Move m; ; \result.contains(m) <==>
-      @     square == m.source && 
-      @     m.dst != null &&
-      @     m.dst.isValid() &&
-      @     MoveGeneratorHelper.isEmptyOrOpponent(m.dst, color, board) &&
-      @     isMoveCorrect(color, board, m);
+      @ ensures \result != null;
+      @ ensures \forall int i; 0 <= i < \result.size(); (
+      @   \result.get(i) != null &&
+      @   \result.get(i).source == square &&
+      @   \result.get(i).theBoard == board &&
+      @   \result.get(i).theSourcePiece == board.at(square) &&
+      @   isMoveCorrect(color, board, \result.get(i))
+      @ );
+      @ ensures \forall Move m; m != null && m.source == square && m.theBoard == board && m.theSourcePiece == board.at(square) && isMoveCorrect(color, board, m); (
+      @           \exists int i; 0 <= i < \result.size(); \result.get(i).equals(m.source, m.dst)
+      @         );
+      @ ensures \fresh(\result);
       @ pure
       @*/
     public List<Move> generateMoves(Square square, Color color, Board board);

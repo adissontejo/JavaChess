@@ -12,11 +12,14 @@ public class StandardMove implements Move {
     //@ spec_public
     protected Square dstSquare; //@ in dst;
     //@ spec_public
+    protected Piece sourcePiece; //@ in theSourcePiece;
+    //@ spec_public
     protected Piece capturedPiece; //@ in theCapturedPiece;
 
     //@ public represents theBoard = board;
     //@ public represents source = srcSquare;
     //@ public represents dst = dstSquare;
+    //@ public represents theSourcePiece = sourcePiece;
     //@ public represents theCapturedPiece = capturedPiece;
 
     /*@ requires board != null && sourceSquare != null && targetSquare != null;
@@ -25,12 +28,14 @@ public class StandardMove implements Move {
       @ ensures source == sourceSquare;
       @ ensures dst == targetSquare;
       @ ensures theBoard == board;
+      @ ensures theSourcePiece == board.at(sourceSquare);
       @ pure
       @*/
     public StandardMove(Square sourceSquare, Square targetSquare, Board board) {
         this.srcSquare = sourceSquare;
         this.board = board;
         this.dstSquare = targetSquare;
+        this.sourcePiece = board.at(sourceSquare);
     }
 
     @Override
@@ -65,6 +70,11 @@ public class StandardMove implements Move {
     @Override
     public Square getDst() {
         return dstSquare;
+    }
+
+    @Override
+    public Piece getSourcePiece() {
+        return sourcePiece;
     }
 
     @Override

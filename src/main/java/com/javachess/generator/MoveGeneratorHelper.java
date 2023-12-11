@@ -18,6 +18,18 @@ public class MoveGeneratorHelper {
       @ public model static boolean isEmptyOrOpponent(Square dst, Color color, Board board);
       @*/
 
+    /*@ requires src != null && color != null && board != null && dst != null;
+      @ requires src.isValid() && dst.isValid();
+      @ ensures \result <==> (
+      @           isEmptyOrOpponent(dst, color, board) &&
+      @           (\exists int i; i > 0; (
+      @             dst.equals(Square.atOffset(src, rowOffset * i, colOffset * i)) &&
+      @             \forall int j; 0 < j < i; board.isFree(Square.atOffset(src, rowOffset * j, colOffset * j))
+      @           ))
+      @         );
+      @ public model static boolean isInVectorEmptyOrOpponent(Square src, int rowOffset, int colOffset, Color color, Board board, Square dst);
+      @*/
+
     /*@ requires color != null && moves != null && board != null;
       @ requires dst == null || dst.isValid();
       @ requires src.isValid();
@@ -51,6 +63,29 @@ public class MoveGeneratorHelper {
         }
     }
 
+    /*@ requires src != null && color != null && board != null;
+      @ requires src.isValid();
+      @ ensures \result != null;
+      @ ensures \forall int i; 0 <= i < \result.size(); (
+      @   \result.get(i) != null &&
+      @   \result.get(i).source == src &&
+      @   \result.get(i).theBoard == board &&
+      @   \result.get(i).theSourcePiece == board.at(src) &&
+      @   isInVectorEmptyOrOpponent(src, rowOffset, colOffset, color, board, \result.get(i).dst)
+      @ );
+      @ ensures \forall Move m;
+      @          m != null &&
+      @          m.source == src &&
+      @          m.theBoard == board &&
+      @          m.theSourcePiece == board.at(src) &&
+      @          isInVectorEmptyOrOpponent(src, rowOffset, colOffset, color, board, m.dst);
+      @          (
+      @            \exists int i; 0 <= i < \result.size();
+      @            \result.get(i).equals(m.source, m.dst)
+      @          );
+      @ code_bigint_math
+      @ pure
+      @*/
     public static List<Move> addVectorIfEmptyOrOpponent(final Square src, final int rowOffset, final int colOffset,
             final Color color, final Board board) {
         List<Move> moves = new ArrayList<>();
@@ -65,6 +100,25 @@ public class MoveGeneratorHelper {
                 break;
             }
         }
+
+        /*@ assume \forall int i; 0 <= i < moves.size(); (
+          @   moves.get(i) != null &&
+          @   moves.get(i).source == src &&
+          @   moves.get(i).theBoard == board &&
+          @   moves.get(i).theSourcePiece == board.at(src) &&
+          @   isInVectorEmptyOrOpponent(src, rowOffset, colOffset, color, board, moves.get(i).dst)
+          @ );
+          @ assume \forall Move m;
+          @        m != null &&
+          @        m.source == src &&
+          @        m.theBoard == board &&
+          @        m.theSourcePiece == board.at(src) &&
+          @        isInVectorEmptyOrOpponent(src, rowOffset, colOffset, color, board, m.dst);
+          @        (
+          @          \exists int i; 0 <= i < moves.size();
+          @          moves.get(i).equals(m.source, m.dst)
+          @        );
+          @*/
 
         return moves;
     }

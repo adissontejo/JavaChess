@@ -70,15 +70,24 @@ public enum Piece {
 
     /*@ requires position != null && board != null;
       @ requires position.isValid();
+      @ requires board.at(position) == this;
       @ ensures \result != null;
       @ ensures \forall int i; 0 <= i < \result.size(); (
       @   \result.get(i) != null &&
       @   \result.get(i).source == position &&
-      @   \result.get(i).theBoard == board
+      @   \result.get(i).theBoard == board &&
+      @   \result.get(i).theSourcePiece == this &&
+      @   type.generator.isMoveCorrect(color, board, \result.get(i))
       @ );
+      @ ensures \forall Move m; m != null && m.source == position && m.theBoard == board && m.theSourcePiece == this && type.generator.isMoveCorrect(color, board, m); (
+      @           \exists int i; 0 <= i < \result.size(); \result.get(i).equals(m.source, m.dst)
+      @         );
+      @ ensures \fresh(\result);
       @ pure
       @*/
     public List<Move> availableMoves(Square position, Board board) {
+        List<Move> moves = type.generator().generateMoves(position, color, board);
+
         return type.generator().generateMoves(position, color, board);
     }
 }

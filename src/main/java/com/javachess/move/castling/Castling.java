@@ -11,10 +11,12 @@ public abstract class Castling implements Move {
 
     private final Board board;
     protected Square kingSquare;
+    protected Piece sourcePiece;
 
     public Castling(Color color, Board board) {
         this.board = board;
         this.kingSquare = BoardEvaluator.findKing(color, board);
+        this.sourcePiece = color == Color.WHITE ? Piece.WHITE_KING : Piece.BLACK_KING;
     }
 
     @Override
@@ -27,6 +29,11 @@ public abstract class Castling implements Move {
     public void undo() {
         board.movePiece(getDst(), kingSquare);
         board.movePiece(getRookDst(), getRookSrc());
+    }
+
+    @Override
+    public Piece getSourcePiece() {
+        return sourcePiece;
     }
 
     @Override

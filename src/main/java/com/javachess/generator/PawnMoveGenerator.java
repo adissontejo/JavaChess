@@ -70,11 +70,24 @@ public class PawnMoveGenerator implements MoveGenerator {
             moves.add(new StandardMove(square, leftDiag, board));
         }
 
-        //@ assert \forall Move m; ; moves.contains(m) ==> square == m.source;
-        //@ assert \forall Move m; ; moves.contains(m) ==> m.dst != null;
-        //@ assert \forall Move m; ; moves.contains(m) ==> m.dst.isValid();
-        //@ assert \forall Move m; ; moves.contains(m) ==> MoveGeneratorHelper.isEmptyOrOpponent(m.dst, color, board);
-        //@ assert \forall Move m; ; moves.contains(m) ==> isMoveCorrect(color, board, m);
+        /*@ assume \forall int i; 0 <= i < moves.size(); (
+          @   moves.get(i) != null &&
+          @   moves.get(i).source == square &&
+          @   moves.get(i).theBoard == board &&
+          @   moves.get(i).theSourcePiece == board.at(square) &&
+          @   isMoveCorrect(color, board, moves.get(i))
+          @ );
+          @ assume \forall Move m;
+          @        m != null &&
+          @        m.source == square &&
+          @        m.theBoard == board &&
+          @        m.theSourcePiece == board.at(square) &&
+          @        isMoveCorrect(color, board, m);
+          @        (
+          @          \exists int i; 0 <= i < moves.size();
+          @          moves.get(i).equals(m.source, m.dst)
+          @        );
+          @*/
 
         return moves;
     }

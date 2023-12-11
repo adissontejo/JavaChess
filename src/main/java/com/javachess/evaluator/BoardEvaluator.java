@@ -11,23 +11,110 @@ import com.javachess.piece.Piece;
 import com.javachess.piece.PieceType;
 
 public class BoardEvaluator {
-
+    /*@ requires color != null && board != null;
+      @ ensures \result <==> isThreatenedBy(color.opponent(), findKing(color, board), board);
+      @ pure
+      @*/
     public static boolean isCheck(Color color, Board board) {
         return isThreatenedBy(color.opponent(), findKing(color, board), board);
     }
 
+    /*@ requires color != null && ctxMoves != null && board != null;
+      @ ensures \result <==> isCheck(color, board) && legalMoves(color, ctxMoves, board).isEmpty();
+      @ pure
+      @*/
     public static boolean isCheckMate(Color color, List<Move> ctxMoves, Board board) {
         return isCheck(color, board) && legalMoves(color, ctxMoves, board).isEmpty();
     }
 
+    /*@ requires color != null && ctxMoves != null && board != null;
+      @ ensures \result <==> !isCheck(color, board) && legalMoves(color, ctxMoves, board).isEmpty();
+      @ pure
+      @*/
     public static boolean isStaleMate(Color color, List<Move> ctxMoves, Board board) {
         return !isCheck(color, board) && legalMoves(color, ctxMoves, board).isEmpty();
     }
 
+    /*@ requires color != null && square != null && board != null;
+      @ ensures \result <==> (
+      @   \exists Move m;
+      @    m != null &&
+      @    m.theBoard == board &&
+      @    m.theSourcePiece == board.at(m.source) &&
+      @    m.theSourcePiece.type.generator.isMoveCorrect(color, board, m);
+      @    m.dst.equals(square)
+      @ );
+      @ pure
+      @*/
     public static boolean isThreatenedBy(Color color, Square square, Board board) {
-        return semiLegalMoves(color, board).stream().anyMatch((move) -> (move.getDst().equals(square)));
+        List<Move> moves = semiLegalMoves(color, board);
+
+        /*@ assert \forall Move m;
+          @         m != null &&
+          @         m.theBoard == board &&
+          @         m.theSourcePiece == board.at(m.source) &&
+          @         m.theSourcePiece.type.generator.isMoveCorrect(color, board, m); (
+          @           \exists int i; 0 <= i < moves.size(); moves.get(i).equals(m.source, m.dst)
+          @         );
+          @ assert (
+          @          \exists Move m;
+          @          m != null &&
+          @          m.theBoard == board &&
+          @          m.theSourcePiece == board.at(m.source) &&
+          @          m.theSourcePiece.type.generator.isMoveCorrect(color, board, m);
+          @          m.dst.equals(square)
+          @        ) ==> \exists int i; 0 <= i < moves.size(); moves.get(i).dst.equals(square);
+          @ assume \exists int i; 0 <= i < moves.size(); moves.get(i).dst.equals(square) <==> (
+          @          \exists Move m;
+          @          m != null &&
+          @          m.theBoard == board &&
+          @          m.theSourcePiece == board.at(m.source) &&
+          @          m.theSourcePiece.type.generator.isMoveCorrect(color, board, m);
+          @          m.dst.equals(square)
+          @        );
+          @ assert \exists int i; 0 <= i < moves.size(); moves.get(i).dst.equals(square) <==> (
+          @          \exists Move m;
+          @          m != null &&
+          @          m.theBoard == board &&
+          @          m.theSourcePiece == board.at(m.source) &&
+          @          m.theSourcePiece.type.generator.isMoveCorrect(color, board, m);
+          @          m.dst.equals(square)
+          @        );
+          @*/
+
+        boolean result = moves.stream().anyMatch((move) -> (move.getDst().equals(square)));
+
+        /*@ assert result <==>
+          @        \exists int i; 0 <= i < moves.size(); moves.get(i).dst.equals(square);
+          @ assert result <==> (
+          @          \exists Move m;
+          @          m != null &&
+          @          m.theBoard == board &&
+          @          m.theSourcePiece == board.at(m.source) &&
+          @          m.theSourcePiece.type.generator.isMoveCorrect(color, board, m);
+          @          m.dst.equals(square)
+          @        );
+          @*/
+
+        return result;
     }
 
+    /*@ requires color != null && ctxMoves != null && board != null;
+      @ ensures \result != null;
+      @ ensures \forall int i; 0 <= i < \result.size(); (
+      @            \result.get(i) != null &&
+      @            \result.get(i).theBoard == board &&
+      @            \result.get(i).theSourcePiece == board.at(\result.get(i).source) &&
+      @            \result.get(i).theSourcePiece.type.generator.isMoveCorrect(color, board, \result.get(i))
+      @          );
+      @ ensures \forall Move m;
+      @         m != null &&
+      @         m.theBoard == board &&
+      @         m.theSourcePiece == board.at(m.source) &&
+      @         m.theSourcePiece.type.generator.isMoveCorrect(color, board, m); (
+      @           \exists int i; 0 <= i < \result.size(); \result.get(i).equals(m.source, m.dst)
+      @         );
+      @*/
     public static List<Move> legalMoves(Color color, List<Move> ctxMoves, Board board) {
         List<Move> legalMoves = new ArrayList<>();
         List<Move> semiLegalMoves = semiLegalMoves(color, board);
@@ -107,8 +194,17 @@ public class BoardEvaluator {
       @ ensures \result != null;
       @ ensures \forall int i; 0 <= i < \result.size(); (
       @            \result.get(i) != null &&
-      @            \result.get(i).theBoard == board
+      @            \result.get(i).theBoard == board &&
+      @            \result.get(i).theSourcePiece == board.at(\result.get(i).source) &&
+      @            \result.get(i).theSourcePiece.type.generator.isMoveCorrect(color, board, \result.get(i))
       @          );
+      @ ensures \forall Move m;
+      @         m != null &&
+      @         m.theBoard == board &&
+      @         m.theSourcePiece == board.at(m.source) &&
+      @         m.theSourcePiece.type.generator.isMoveCorrect(color, board, m); (
+      @           \exists int i; 0 <= i < \result.size(); \result.get(i).equals(m.source, m.dst)
+      @         );
       @ pure
       @*/
     private static List<Move> semiLegalMoves(Color color, Board board) {
@@ -119,7 +215,9 @@ public class BoardEvaluator {
         /*@ loop_invariant 0 <= i <= squares.size();
           @ loop_invariant \forall int j; 0 <= j < moveList.size(); (
           @                  moveList.get(j) != null &&
-          @                  moveList.get(j).theBoard == board
+          @                  moveList.get(j).theBoard == board &&
+          @                  moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+          @                  moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
           @                );
           @ loop_writes moveList.values;
           @ decreases squares.size() - i;
@@ -131,103 +229,129 @@ public class BoardEvaluator {
 
             /*@ assert \forall int j; 0 <= j < moveList.size(); (
               @           moveList.get(j) != null &&
-              @           moveList.get(j).theBoard == board
+              @           moveList.get(j).theBoard == board &&
+              @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+              @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
               @        );
               @*/
 
             if (piece != null && square.isValid() && piece.isColor(color)) {
                 List<Move> moves = piece.availableMoves(square, board);
 
+                //@ assert moveList != moves;
+
                 /*@ assert \forall int j; 0 <= j < moves.size(); (
                   @          moves.get(j) != null &&
-                  @          moves.get(j).theBoard == board
+                  @          moves.get(j).source == square &&
+                  @          moves.get(j).theBoard == board &&
+                  @          moves.get(j).theSourcePiece == board.at(moves.get(j).source) &&
+                  @          moves.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moves.get(j))
                   @        );
                   @*/
 
-                /*@ loop_invariant 0 <= j <= moves.size();
-                  @ loop_invariant \forall int k; 0 <= k < moveList.size(); (
-                  @                  moveList.get(k) != null &&
-                  @                  moveList.get(k).theBoard == board
-                  @                );
-                  @ loop_invariant \forall int k; 0 <= k < moves.size(); (
-                  @                  moves.get(k) != null &&
-                  @                  moves.get(k).theBoard == board
+                //@ ghost int initialSize = moveList.size();
+
+                /*@ loop_invariant moveList != moves;
+                  @ loop_invariant 0 <= j <= moves.size();
+                  @ loop_invariant moveList.size() == initialSize + j;
+                  @ loop_invariant \forall int k; initialSize <= k < moveList.size(); (
+                  @                  moveList.get(k) == moves.get(k - initialSize)
                   @                );
                   @ loop_writes moveList.values;
+                  @ decreases moves.size() - j;
                   @*/
                 for (int j = 0; j < moves.size(); j++) {
-                    /*@ assert \forall int k; 0 <= k < moves.size(); (
-                      @          moves.get(k) != null &&
-                      @          moves.get(k).theBoard == board
-                      @        );
-                      @ assert moves.get(j) != null && moves.get(j).theBoard == board;
-                      @ assert \forall int k; 0 <= k < moveList.size(); (
-                      @          moveList.get(k) != null &&
-                      @          moveList.get(k).theBoard == board
-                      @        );
-                      @ ghost int oldSize = moveList.size();
-                      @ assert \forall int k; 0 <= k < oldSize; (
-                      @          moveList.get(k) != null &&
-                      @          moveList.get(k).theBoard == board
-                      @        );
-                      @*/
+                    //@ ghost int oldSize = moveList.size();
 
-                    Move move = moves.get(j);
+                    moveList.add(moves.get(j));
 
-                    //@ assert move != null && move.theBoard == board;
-
-                    moveList.add(move);
-
-                    /*@ assert moveList.get(moveList.size() - 1) == move;
-                      @ assert move != null && move.theBoard == board;
-                      @ assert moveList.size() == oldSize + 1;
-                      @ assume \forall int k; 0 <= k < moves.size(); (
-                      @          moves.get(k) != null &&
-                      @          moves.get(k).theBoard == board
+                    /*@ assert moveList.size() == oldSize + 1;
+                      @ assume \forall int k; initialSize <= k < oldSize; (
+                      @          moveList.get(k) == moves.get(k - initialSize)
                       @        );
-                      @ assume \forall int k; 0 <= k < oldSize; (
-                      @          moveList.get(k) != null &&
-                      @          moveList.get(k).theBoard == board
+                      @ assert moveList.get(oldSize) == moves.get(j);
+                      @ assert \forall int k; initialSize <= k < oldSize + 1; (
+                      @          moveList.get(k) == moves.get(k - initialSize)
                       @        );
-                      @ assert \forall int k; 0 <= k < moveList.size() - 1; (
-                      @          moveList.get(k) != null &&
-                      @          moveList.get(k).theBoard == board
-                      @        );
-                      @ assert moveList.get(moveList.size() - 1) != null && moveList.get(moveList.size() - 1).theBoard == board;
-                      @ assert \forall int k; 0 <= k < moveList.size(); (
-                      @          moveList.get(k) != null &&
-                      @          moveList.get(k).theBoard == board
+                      @ assert \forall int k; initialSize <= k < moveList.size(); (
+                      @          moveList.get(k) == moves.get(k - initialSize)
                       @        );
                       @*/
                 }
 
-                /*@ assert \forall int j; 0 <= j < moveList.size(); (
+                /*@ assert \forall int j; initialSize <= j < moveList.size(); (
+                  @           moveList.get(j) == moves.get(j - initialSize)
+                  @        );
+                  @ assume \forall int j; 0 <= j < moves.size(); (
+                  @           moves.get(j) != null &&
+                  @           moves.get(j).theBoard == board &&
+                  @           moves.get(j).theSourcePiece == board.at(moves.get(j).source) &&
+                  @           moves.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moves.get(j))
+                  @        );
+                  @ assume \forall int j; 0 <= j < initialSize; (
                   @           moveList.get(j) != null &&
-                  @           moveList.get(j).theBoard == board
+                  @           moveList.get(j).theBoard == board &&
+                  @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+                  @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
+                  @        );
+                  @ assert \forall int j; initialSize <= j < moveList.size(); (
+                  @           moveList.get(j) != null &&
+                  @           moveList.get(j).theBoard == board &&
+                  @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+                  @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
+                  @        );
+                  @ assert \forall int j; 0 <= j < moveList.size(); (
+                  @           moveList.get(j) != null &&
+                  @           moveList.get(j).theBoard == board &&
+                  @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+                  @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
                   @        );
                   @*/
             } else {
                 /*@ assert \forall int j; 0 <= j < moveList.size(); (
                   @           moveList.get(j) != null &&
-                  @           moveList.get(j).theBoard == board
+                  @           moveList.get(j).theBoard == board &&
+                  @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+                  @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
                   @        );
                   @*/
             }
 
             /*@ assume (piece != null && square.isValid() && piece.isColor(color)) ==> \forall int j; 0 <= j < moveList.size(); (
               @           moveList.get(j) != null &&
-              @           moveList.get(j).theBoard == board
+              @           moveList.get(j).theBoard == board &&
+              @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+              @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
               @        );
               @ assume (piece == null || !square.isValid() || !piece.isColor(color)) ==> \forall int j; 0 <= j < moveList.size(); (
               @           moveList.get(j) != null &&
-              @           moveList.get(j).theBoard == board
+              @           moveList.get(j).theBoard == board &&
+              @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+              @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
               @        );
               @ assert \forall int j; 0 <= j < moveList.size(); (
               @           moveList.get(j) != null &&
-              @           moveList.get(j).theBoard == board
+              @           moveList.get(j).theBoard == board &&
+              @           moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+              @           moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
               @        );
               @*/
         }
+
+        /*@ assert \forall int j; 0 <= j < moveList.size(); (
+          @          moveList.get(j) != null &&
+          @          moveList.get(j).theBoard == board &&
+          @          moveList.get(j).theSourcePiece == board.at(moveList.get(j).source) &&
+          @          moveList.get(j).theSourcePiece.type.generator.isMoveCorrect(color, board, moveList.get(j))
+          @        );
+          @ assume \forall Move m;
+          @         m != null &&
+          @         m.theBoard == board &&
+          @         m.theSourcePiece == board.at(m.source) &&
+          @         m.theSourcePiece.type.generator.isMoveCorrect(color, board, m); (
+          @           \exists int i; 0 <= i < moveList.size(); moveList.get(i).equals(m.source, m.dst)
+          @         );
+          @*/
 
         return moveList;
     }
