@@ -88,6 +88,6 @@ public enum Piece {
     public List<Move> availableMoves(Square position, Board board) {
         List<Move> moves = type.generator().generateMoves(position, color, board);
 
-        return type.generator().generateMoves(position, color, board);
+        return moves;
     }
 }

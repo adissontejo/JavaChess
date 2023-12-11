@@ -27,12 +27,14 @@ public class MoveGeneratorHelper {
       @             \forall int j; 0 < j < i; board.isFree(Square.atOffset(src, rowOffset * j, colOffset * j))
       @           ))
       @         );
+      @ pure
       @ public model static boolean isInVectorEmptyOrOpponent(Square src, int rowOffset, int colOffset, Color color, Board board, Square dst);
       @*/
 
     /*@ requires color != null && moves != null && board != null;
       @ requires dst == null || dst.isValid();
-      @ requires src.isValid();
+      @ requires src == null || src.isValid();
+      @ requires (dst != null && src != null) ==> !dst.equals(src);
       @ {|
       @     requires src != null && dst != null;
       @     requires isEmptyOrOpponent(dst, color, board);
@@ -92,7 +94,10 @@ public class MoveGeneratorHelper {
 
         Square square = Square.atOffset(src, rowOffset, colOffset);
 
+        /*@ loop_invariant square == null || square.isValid();
+          @*/
         while (board.isFree(square) || board.isColor(square, color.opponent())) {
+            //@ assume !src.equals(square);
             moves.add(new StandardMove(src, square, board));
             square = Square.atOffset(square, rowOffset, colOffset);
 

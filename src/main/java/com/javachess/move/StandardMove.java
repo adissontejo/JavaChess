@@ -86,4 +86,14 @@ public class StandardMove implements Move {
     public boolean equals(Square source, Square target) {
         return getSource().equals(source) && getDst().equals(target);
     }
+
+    @Override
+    public Move copy() {
+       return new StandardMove(srcSquare, dstSquare, board.copy());
+    }
+
+    @Override
+    public Board getBoard() {
+        return board;
+    }
 }

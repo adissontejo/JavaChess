@@ -8,10 +8,12 @@ public class Square {
     private final int row; //@ in theHashCode;
                            //@ in uniqueHash;
 
-    /*@   requires col >= 0 && col < 8 && row >= 0 && row < 8;
+    /*@   public normal_behavior
+      @   requires col >= 0 && col < 8 && row >= 0 && row < 8;
       @   ensures \result != null;
       @   ensures \result.row == row && \result.col == col;
       @ also
+      @   public normal_behavior
       @   requires col < 0 || col >= 8 || row < 0 || row >= 8;
       @   ensures \result == null;
       @ pure
@@ -43,6 +45,7 @@ public class Square {
       @ |}
       @ code_bigint_math
       @ pure
+      @ helper
       @*/
     public static Square atOffset(Square square, int row, int col) {
         Square newSquare = at(square.getRow() + row, square.getCol() + col);
@@ -50,7 +53,8 @@ public class Square {
         return newSquare;
     }
 
-    /*@ ensures this.col == column;
+    /*@ private normal_behavior
+      @ ensures this.col == column;
       @ ensures this.row == row;
       @ pure
       @*/
@@ -73,7 +77,8 @@ public class Square {
         return row;
     }
 
-    /*@ ensures \result <==> (col >= 0 && col < 8 && row >= 0 && row < 8);
+    /*@ public normal_behavior
+      @ ensures \result <==> (col >= 0 && col < 8 && row >= 0 && row < 8);
       @ pure
       @*/
     public boolean isValid() {

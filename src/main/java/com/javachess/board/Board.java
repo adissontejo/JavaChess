@@ -36,7 +36,9 @@ public class Board {
         this.positions = newBoard;
     }
 
-    /*@ ensures \forall Square s; ; at(s) == \result.at(s);
+    /*@ ensures \result != null;
+      @ ensures \result != this;
+      @ ensures \forall Square s; ; at(s) == \result.at(s);
       @ ensures \forall Square s; ; positions.get(s) == \old(positions.get(s));
       @ pure
       @*/

@@ -1,5 +1,6 @@
 package com.javachess.move;
 
+import com.javachess.board.Board;
 import com.javachess.board.Square;
 import com.javachess.piece.Piece;
 
@@ -8,7 +9,7 @@ public interface Move {
     //@ public instance model Square dst;
     //@ public instance model Piece theSourcePiece;
     //@ public instance model Piece theCapturedPiece;
-    //@ public instance model com.javachess.board.Board theBoard;
+    //@ public instance model Board theBoard;
 
     //@ public invariant source != null;
     //@ public invariant dst != null;
@@ -59,4 +60,18 @@ public interface Move {
       @ pure
       @*/
     public boolean equals(Square src, Square dst);
+
+    /*@ ensures \result != null;
+      @ ensures \result.source == source;
+      @ ensures \result.dst == dst;
+      @ ensures \result.theBoard != theBoard;
+      @ ensures \result != this;
+      @ pure
+      @*/
+    public Move copy();
+
+    /*@ ensures \result == theBoard;
+      @ pure
+      @*/
+    public Board getBoard();
 }
